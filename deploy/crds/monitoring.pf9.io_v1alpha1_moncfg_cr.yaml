@@ -1,0 +1,43 @@
+apiVersion: monitoring.pf9.io/v1alpha1
+kind: MonCfg
+metadata:
+  name: example-moncfg
+spec:
+  global: 
+    serviceAccountName: system-prometheus-b
+    namespace: pf9-monitoring
+  prometheus:
+    name: system
+    replicas: 1
+    port: http
+    resources:
+      requests:
+        cpu: 50m
+        memory: 52Mi
+    retention: 25d
+    namespaceselector:
+    - pf9-monitoring
+    selector:
+    - key: exp
+      values:
+      - node-exporter
+      - kube-state-metrics
+
+
+  alertmanager:
+    name: sysalert
+    replicas: 1
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+    receivers:
+      - type: slack
+        params:
+        - name: url
+          value: https://hooks.slack.com/services/T02SN3ST3
+        - name: channel
+          value: '#alertmgr'
+        - name: severity
+          value: critical
+
